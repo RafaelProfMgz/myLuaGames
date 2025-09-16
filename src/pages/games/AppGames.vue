@@ -165,10 +165,4 @@ onMounted(() => {
 .v-slide-group__content {
   flex-wrap: nowrap;
 }
-
-.v-data-table-virtual {
-  /* Estilos para a tabela, se precisar de ajustes específicos */
-  /* Exemplo: */
-  /* background-color: rgb(var(--v-theme-surface)) */
-}
 </style>

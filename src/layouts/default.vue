@@ -21,7 +21,6 @@ import AppFooter from "@/components/layout/AppFooter.vue";
 import AppHeader from "@/components/layout/AppHeader.vue";
 import AppSideBar from "@/components/layout/AppSideBar.vue";
 import { ref } from "vue";
-
 const drawer = ref(null);
 </script>
 

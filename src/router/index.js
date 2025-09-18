@@ -17,14 +17,26 @@ const router = createRouter({
 // Guardião de Rota
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
-
   const token = localStorage.getItem("auth_token");
 
-  if (requiresAuth && !token) {
+  // Rota não encontrada
+  if (to.matched.length === 0) {
+    if (!token) {
+      next("/login/Login"); // Redireciona para o login se não estiver autenticado
+    } else {
+      next("/"); // Redireciona para a home se estiver autenticado
+    }
+  }
+  // Rota que requer autenticação, mas o usuário não tem token
+  else if (requiresAuth && !token) {
     next("/login/Login");
-  } else if (token && to.path === "/login/Login") {
+  }
+  // Usuário autenticado tentando acessar a página de login
+  else if (token && to.path === "/login/Login") {
     next("/");
-  } else {
+  }
+  // Todas as outras condições
+  else {
     next();
   }
 });

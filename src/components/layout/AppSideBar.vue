@@ -9,7 +9,7 @@
             title="John Leider"
           >
             <template v-slot:append>
-              <v-btn icon="mdi-menu-down" size="small" variant="text"></v-btn>
+              <DropMenuHover />
             </template>
           </v-list-item>
         </v-list>
@@ -33,11 +33,13 @@
         </v-list>
       </v-navigation-drawer>
 
-      <v-main style="height: 354px"></v-main>
+      <v-main style="height: 100vh"></v-main>
     </v-layout>
   </v-card>
 </template>
 <script setup>
+import DropMenuHover from "../ui/DropMenuHover.vue";
+
 const items = reactive([
   { text: "Home", icon: "mdi-home", value: "/" },
   { text: "Meus jogos", icon: "mdi-folder", value: "/games/AppGames" },

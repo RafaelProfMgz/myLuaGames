@@ -64,7 +64,12 @@ const performSearch = () => {
 .float-button {
   position: fixed;
   bottom: 80px; /* Aumentei um pouco a distância do fundo */
-  right: 24px; /* Aumentei um pouco a distância da direita */
+  right: 34px; /* Aumentei um pouco a distância da direita */
   z-index: 1000; /* Garante que o botão fique acima de outros elementos */
+}
+.float-button:hover {
+  transform: scale(1.1); /* Aumenta o tamanho do botão ao passar o mouse */
+  animation-duration: 300ms;
+  transition: all 0.3s ease-in-out;
 }
 </style>

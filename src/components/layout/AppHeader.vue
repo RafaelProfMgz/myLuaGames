@@ -1,17 +1,22 @@
 <template>
   <header class="app-header">
     <div class="app-header__center">
-      <img
-        src="@/assets/logo.svg"
-        alt="Vuetify Logo"
-        class="app-header__logo-img"
-      />
-      <span class="app-header__app-name">Seu App</span>
+      <div class="app-header__logo">
+        <img
+          src="@/assets/logo.svg"
+          alt="Vuetify Logo"
+          class="app-header__logo-img"
+        />
+        <span class="app-header__app-name">Seu App</span>
+        <SelectTheme />
+      </div>
     </div>
   </header>
 </template>
 
-<script setup></script>
+<script setup>
+import SelectTheme from "../ui/SelectTheme.vue";
+</script>
 
 <style scoped>
 /* Estiliza o header */
@@ -30,6 +35,12 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+}
+/* Estiliza a seção da logo */
+.app-header__logo {
+  width: 100%;
+  display: flex;
+  align-items: center;
 }
 
 /* Estiliza a logo */

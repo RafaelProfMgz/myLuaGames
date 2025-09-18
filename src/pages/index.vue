@@ -7,5 +7,3 @@
 <script setup>
 import AppHome from "./home/AppHome.vue";
 </script>
-
-<style scoped></style>

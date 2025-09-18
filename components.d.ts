@@ -8,6 +8,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AppBackground: typeof import('./src/components/animation/AppBackground.vue')['default']
     AppFloatButton: typeof import('./src/components/layout/AppFloatButton.vue')['default']
     AppFooter: typeof import('./src/components/layout/AppFooter.vue')['default']
     AppHeader: typeof import('./src/components/layout/AppHeader.vue')['default']
@@ -21,7 +22,10 @@ declare module 'vue' {
     HerosAnimation: typeof import('./src/components/generic/heros/HerosAnimation.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    Sing: typeof import('./src/pages/sing/Sing.vue')['default']
+    SelectTheme: typeof import('./src/components/ui/SelectTheme.vue')['default']
+    Sing: typeof import('././src/components/ui/selectTheme.vue]
+    Switch: typeof import('./src./src/components/ui/selectTheme.vueefault']
+    SwitchTheme: typeof import('./src/components/ui/SwitchTheme.vue')['default']
     VIconsAnimation: typeof import('./src/components/animation/VIconsAnimation.vue')['default']
     VPulseStars: typeof import('./src/components/animation/VPulseStars.vue')['default']
     VshootingStars: typeof import('./src/components/animation/VShootingStars.vue')['default']

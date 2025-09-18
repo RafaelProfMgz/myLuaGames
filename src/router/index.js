@@ -14,7 +14,21 @@ const router = createRouter({
   routes: setupLayouts(routes),
 });
 
-// Workaround for https://github.com/vitejs/vite/issues/11804
+// Guardião de Rota
+router.beforeEach((to, from, next) => {
+  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+
+  const token = localStorage.getItem("auth_token");
+
+  if (requiresAuth && !token) {
+    next("/login/Login");
+  } else if (token && to.path === "/login/Login") {
+    next("/");
+  } else {
+    next();
+  }
+});
+
 router.onError((err, to) => {
   if (err?.message?.includes?.("Failed to fetch dynamically imported module")) {
     if (localStorage.getItem("vuetify:dynamic-reload")) {

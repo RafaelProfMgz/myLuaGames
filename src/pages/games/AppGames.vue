@@ -1,3 +1,11 @@
+<route lang="json">
+{
+  "meta": {
+    "requiresAuth": true
+  }
+}
+</route>
+
 <template>
   <v-container fluid class="pa-4">
     <!-- Seção: Jogos com Mais Horas de Jogo -->

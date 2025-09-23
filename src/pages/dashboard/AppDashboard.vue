@@ -1,9 +1,9 @@
-<route lang="json">
-{
-  "meta": {
-    "requiresAuth": true
-  }
-}
+<route lang="yaml">
+meta:
+  requiresAuth: true
+  searchable: true
+  title: "Página Dashboard"
+  icon: "mdi-check-circle-outline"
 </route>
 
 <template>

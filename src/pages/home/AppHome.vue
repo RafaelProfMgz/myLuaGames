@@ -1,19 +1,18 @@
-<route lang="json">
-{
-  "meta": {
-    "requiresAuth": true
-  }
-}
+<route lang="yaml">
+meta:
+  requiresAuth: true
+  searchable: true
+  title: "Página home"
+  icon: "mdi-check-circle-outline"
 </route>
+
 <template>
   <v-container fluid class="dashboard-container pa-4">
-    <!-- Título do Dashboard -->
     <h1 class="text-h4 font-weight-bold mb-6 text-primary">
       <v-icon size="36" class="mr-3">mdi-view-dashboard</v-icon>Dashboard da
       Biblioteca
     </h1>
 
-    <!-- Seção 1: Estatísticas Rápidas (Cards de Visão Geral) -->
     <v-row class="mb-6">
       <v-col cols="12" sm="6" md="3">
         <v-card class="dashboard-card" elevation="2">

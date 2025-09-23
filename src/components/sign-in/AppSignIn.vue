@@ -1,48 +1,45 @@
 <template>
-  <v-container fluid>
-    <v-title>Login</v-title>
+  <v-container class="pa-0">
     <v-form @submit.prevent="onSubmit">
-      <v-row>
-        <v-col cols="12">
-          <v-text-field
-            v-model="form.username"
-            label="Email ou Usuário"
-            variant="outlined"
-            density="comfortable"
-            clearable
-            placeholder="Digite seu email ou usuário"
-          ></v-text-field>
-        </v-col>
-        <v-col cols="12">
-          <v-text-field
-            v-model="form.password"
-            label="Senha"
-            variant="outlined"
-            density="comfortable"
-            clearable
-            type="password"
-            placeholder="Digite sua senha"
-          ></v-text-field>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="12">
-          <v-btn block color="primary" type="submit">Login</v-btn>
-        </v-col>
-      </v-row>
+      <v-text-field
+        v-model="form.username"
+        label="E-mail ou Usuário"
+        variant="solo-filled"
+        density="compact"
+        clearable
+        placeholder="Digite seu e-mail ou usuário"
+        prepend-inner-icon="mdi-account"
+        class="mb-3"
+      ></v-text-field>
+
+      <v-text-field
+        v-model="form.password"
+        label="Senha"
+        variant="solo-filled"
+        density="compact"
+        clearable
+        type="password"
+        placeholder="Digite sua senha"
+        prepend-inner-icon="mdi-lock"
+        class="mb-3"
+      ></v-text-field>
+
+      <v-btn block color="primary" type="submit" size="large">Entrar</v-btn>
     </v-form>
   </v-container>
 </template>
 
 <script setup>
+import { reactive, defineEmits } from "vue";
+
+const emit = defineEmits(["submit"]);
+
 const form = reactive({
   username: "",
   password: "",
 });
 
 const onSubmit = () => {
-  console.log(form);
+  emit("submit", form);
 };
 </script>
-
-<style scoped></style>

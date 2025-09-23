@@ -43,11 +43,6 @@ import DropMenuHover from "../ui/DropMenuHover.vue";
 const items = reactive([
   { text: "Home", icon: "mdi-home", value: "/" },
   { text: "Meus jogos", icon: "mdi-folder", value: "/games/AppGames" },
-  {
-    text: "Amigos",
-    icon: "mdi-account-multiple",
-    value: "/friends/AppFriends",
-  },
   { text: "Favoritos", icon: "mdi-star", value: "AppFavorites" },
   { text: "Histórico", icon: "mdi-history", value: "/hystory/AppHistory" },
   {

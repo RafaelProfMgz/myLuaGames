@@ -1,50 +1,50 @@
 <template>
-  <v-container fluid>
-    <v-title>Cadastrar</v-title>
+  <v-container class="pa-0">
     <v-form @submit.prevent="onSubmit">
-      <v-row>
-        <v-col cols="12">
-          <v-text-field
-            v-model="form.username"
-            label="Usuário"
-            variant="outlined"
-            density="comfortable"
-            clearable
-            placeholder="Digite seu usuário"
-          ></v-text-field>
-        </v-col>
-        <v-col cols="12">
-          <v-text-field
-            v-model="form.email"
-            label="Email"
-            variant="outlined"
-            density="comfortable"
-            clearable
-            placeholder="Digite seu email"
-          ></v-text-field>
-        </v-col>
-        <v-col cols="12">
-          <v-text-field
-            v-model="form.password"
-            label="Senha"
-            variant="outlined"
-            density="comfortable"
-            clearable
-            type="password"
-            placeholder="Digite sua senha"
-          ></v-text-field>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="12">
-          <v-btn block color="primary" type="submit">Cadastrar</v-btn>
-        </v-col>
-      </v-row>
+      <v-text-field
+        v-model="form.username"
+        label="Nome de Usuário"
+        variant="solo-filled"
+        density="compact"
+        clearable
+        placeholder="Escolha um nome de usuário"
+        prepend-inner-icon="mdi-account"
+        class="mb-3"
+      ></v-text-field>
+
+      <v-text-field
+        v-model="form.email"
+        label="E-mail"
+        variant="solo-filled"
+        density="compact"
+        clearable
+        placeholder="Digite seu e-mail"
+        prepend-inner-icon="mdi-email"
+        class="mb-3"
+      ></v-text-field>
+
+      <v-text-field
+        v-model="form.password"
+        label="Senha"
+        variant="solo-filled"
+        density="compact"
+        clearable
+        type="password"
+        placeholder="Crie uma senha forte"
+        prepend-inner-icon="mdi-lock"
+        class="mb-3"
+      ></v-text-field>
+
+      <v-btn block color="primary" type="submit" size="large">Cadastrar</v-btn>
     </v-form>
   </v-container>
 </template>
 
 <script setup>
+import { reactive, defineEmits } from "vue";
+
+const emit = defineEmits(["submit"]);
+
 const form = reactive({
   username: "",
   email: "",
@@ -52,8 +52,6 @@ const form = reactive({
 });
 
 const onSubmit = () => {
-  console.log(form);
+  emit("submit", form);
 };
 </script>
-
-<style scoped></style>

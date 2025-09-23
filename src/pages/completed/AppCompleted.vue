@@ -1,3 +1,11 @@
+<route lang="yaml">
+meta:
+  requiresAuth: true
+  searchable: true
+  title: "Página Completados"
+  icon: "mdi-check-circle-outline"
+</route>
+
 <template>
   <v-sheet class="mx-auto pa-2 pt-6" color="grey-lighten-4">
     <v-sheet

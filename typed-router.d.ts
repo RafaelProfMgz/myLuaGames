@@ -22,7 +22,6 @@ declare module 'vue-router/auto-routes' {
     '/completed/AppCompleted': RouteRecordInfo<'/completed/AppCompleted', '/completed/AppCompleted', Record<never, never>, Record<never, never>>,
     '/dashboard/AppDashboard': RouteRecordInfo<'/dashboard/AppDashboard', '/dashboard/AppDashboard', Record<never, never>, Record<never, never>>,
     '/favorites/AppFavorites': RouteRecordInfo<'/favorites/AppFavorites', '/favorites/AppFavorites', Record<never, never>, Record<never, never>>,
-    '/friends/AppFriends': RouteRecordInfo<'/friends/AppFriends', '/friends/AppFriends', Record<never, never>, Record<never, never>>,
     '/games/AppGames': RouteRecordInfo<'/games/AppGames', '/games/AppGames', Record<never, never>, Record<never, never>>,
     '/history/AppHistory': RouteRecordInfo<'/history/AppHistory', '/history/AppHistory', Record<never, never>, Record<never, never>>,
     '/home/AppHome': RouteRecordInfo<'/home/AppHome', '/home/AppHome', Record<never, never>, Record<never, never>>,

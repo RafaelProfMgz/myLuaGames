@@ -39,24 +39,38 @@
 
 <script setup>
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 import AppSignIn from "@/components/sign-in/AppSignIn.vue";
 import AppSignUp from "@/components/sign-up/AppSignUp.vue";
-import router from "@/router";
+import { useAppStore } from "@/stores/app";
 import AppBackground from "@/components/animation/AppBackground.vue";
+import { registerUser, verifyCredentials } from "@/services/userService";
 
 const tab = ref("signIn");
-const onSignIn = (formData) => {
-  const fakeToken = "abcde12345";
+const router = useRouter();
+const appStore = useAppStore();
 
-  localStorage.setItem("auth_token", fakeToken);
+const onSignIn = async (formData) => {
+  try {
+    const userData = await verifyCredentials(formData);
 
-  router.push("/");
+    appStore.login(userData);
+
+    router.push("/");
+  } catch (error) {
+    alert(error.message);
+  }
 };
 
-const onSignUp = (formData) => {
-  console.log("Dados de Cadastro:", formData);
-  // **AQUI você faria a chamada à sua API de cadastro de usuário**
-  // Ex: axios.post('/api/register', formData);
+const onSignUp = async (formData) => {
+  try {
+    await registerUser(formData);
+
+    alert("Cadastro realizado com sucesso! Agora você já pode fazer o login.");
+    tab.value = "signIn";
+  } catch (error) {
+    alert(error.message);
+  }
 };
 </script>
 

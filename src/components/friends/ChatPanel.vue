@@ -16,14 +16,17 @@
     <!-- ÁREA DE MENSAGENS -->
     <div class="messages-area" ref="messagesContainer">
       <div
-        v-for="message in messages"
-        :key="message.timestamp"
+        v-for="message in chatMessages"
+        :key="message.timestamp + Math.random()"
         class="message-wrapper"
-        :class="{ 'my-message': message.sender === 'me' }"
+        :class="{ 'my-message': message.senderId === myUserId }"
       >
         <v-sheet class="message pa-2 rounded-lg" :elevation="2">
           {{ message.text }}
         </v-sheet>
+      </div>
+      <div v-if="chatMessages.length === 0" class="text-center text-grey pa-4">
+        Comece uma conversa!
       </div>
     </div>
 
@@ -49,7 +52,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, nextTick } from "vue";
+import { ref, onMounted, watch, nextTick, computed } from "vue";
+import useChatSocket from "@/plugins/socket";
 
 const props = defineProps({
   friend: {
@@ -60,65 +64,68 @@ const props = defineProps({
 
 const emit = defineEmits(["close"]);
 
-const messages = ref([]);
+const {
+  userId: myUserId,
+  currentChatHistory,
+  sendPrivateMessage,
+  requestChatHistory,
+} = useChatSocket();
+
 const newMessage = ref("");
 const messagesContainer = ref(null);
 
-// --- Lógica do Chat e localStorage ---
-
-// Carrega o histórico de chat do localStorage
-const loadMessages = () => {
-  const allChats = JSON.parse(localStorage.getItem("chatHistory") || "{}");
-  // Carrega as mensagens para o amigo específico, ou um array vazio se não houver
-  messages.value = allChats[props.friend.id] || [];
-  scrollToBottom();
-};
-
-// Salva o histórico de chat no localStorage
-const saveMessages = () => {
-  const allChats = JSON.parse(localStorage.getItem("chatHistory") || "{}");
-  allChats[props.friend.id] = messages.value;
-  localStorage.setItem("chatHistory", JSON.stringify(allChats));
-};
+// Computa as mensagens para o amigo atual a partir do histórico do socket
+const chatMessages = computed(() => {
+  return currentChatHistory.value[props.friend.id] || [];
+});
 
 const sendMessage = () => {
   const text = newMessage.value.trim();
-  if (!text) return;
+  if (!text || !myUserId.value) return;
 
-  messages.value.push({
-    text: text,
-    sender: "me", // Assumimos que a mensagem enviada é 'nossa'
-    timestamp: Date.now(),
-  });
-
+  sendPrivateMessage(props.friend.id, text);
   newMessage.value = "";
-  saveMessages();
   scrollToBottom();
 };
 
-// Rola a área de mensagens para o final
 const scrollToBottom = async () => {
-  await nextTick(); // Espera o DOM ser atualizado
+  await nextTick();
   if (messagesContainer.value) {
     messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
   }
 };
 
-// Carrega as mensagens quando o componente é montado
-onMounted(loadMessages);
+onMounted(() => {
+  // Solicita o histórico de chat para o amigo atual ao montar
+  requestChatHistory(props.friend.id);
+  scrollToBottom();
+});
 
-// Observa mudanças no amigo selecionado para carregar o novo histórico de chat
+// Observa mudanças no amigo selecionado para solicitar o novo histórico e rolar
 watch(
   () => props.friend,
+  (newFriend) => {
+    if (newFriend) {
+      requestChatHistory(newFriend.id);
+      scrollToBottom();
+    }
+  },
+  { immediate: true } // Executa a função do watcher imediatamente na montagem
+);
+
+// Observa mudanças no chatMessages para rolar para baixo automaticamente
+watch(
+  chatMessages,
   () => {
-    loadMessages();
-  }
+    scrollToBottom();
+  },
+  { deep: true }
 );
 </script>
 
 <style scoped>
 .chat-panel-container {
-  width: 350px; /* Largura do painel de chat */
+  width: 350px;
   height: 500px;
   max-height: 60vh;
   display: flex;
@@ -139,11 +146,11 @@ watch(
 }
 
 .my-message {
-  justify-content: flex-end; /* Alinha nossas mensagens à direita */
+  justify-content: flex-end;
 }
 
 .my-message .message {
-  background-color: rgb(var(--v-theme-primary)); /* Cor primária do tema */
+  background-color: rgb(var(--v-theme-primary));
   color: rgb(var(--v-theme-on-primary));
 }
 

@@ -50,7 +50,7 @@
               >
                 <template v-slot:prepend>
                   <v-badge
-                    :color="getStatusColor(friend.status)"
+                    :color="getOnlineStatusColor(friend.id)"
                     dot
                     location="bottom end"
                     offset-x="3"
@@ -129,16 +129,17 @@
           <v-form ref="form" v-model="isFormValid">
             <v-text-field
               v-model="newFriend.name"
-              label="Nome do Amigo"
+              label="ID ou Nome do Amigo"
               :rules="[rules.required]"
               variant="outlined"
             ></v-text-field>
-            <v-select
+            <!-- O status não será mais definido pelo cliente, mas pelo servidor -->
+            <!-- <v-select
               v-model="newFriend.status"
               :items="['online', 'offline']"
               label="Status"
               variant="outlined"
-            ></v-select>
+            ></v-select> -->
           </v-form>
         </v-card-text>
         <v-card-actions>
@@ -161,18 +162,21 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from "vue";
+import useChatSocket from "@/plugins/socket";
 
 const emit = defineEmits(["close", "open-chat"]);
-const panel = ref(["online"]);
+const panel = ref(["online"]); // Expande a categoria online por padrão
 const searchQuery = ref("");
 const friends = ref([]);
 const addFriendDialog = ref(false);
 const isFormValid = ref(false);
 const form = ref(null);
 
+const { onlineUsers } = useChatSocket(); // Obtém o estado onlineUsers do socket
+
 const newFriend = ref({
   name: "",
-  status: "online",
+  // status: "online", // Não será mais definido manualmente, mas pelo servidor
 });
 
 const openChat = (friend) => {
@@ -201,25 +205,27 @@ watch(
 const saveFriend = () => {
   if (!isFormValid.value) return;
 
+  // Em um sistema real, você faria uma requisição para adicionar um amigo no backend
+  // Por enquanto, simulamos aqui
   friends.value.push({
-    id: Date.now(),
+    id: newFriend.value.name.toLowerCase().replace(/\s/g, ""), // Usar o nome como ID simples para simulação
     name: newFriend.value.name,
     avatar: `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 70)}`,
-    status: newFriend.value.status,
-    game: null,
+    game: null, // O status será determinado pelo servidor
   });
 
   form.value.reset();
-  newFriend.value.status = "online";
+  newFriend.value.name = ""; // Limpa o nome para o próximo
   addFriendDialog.value = false;
 };
 
 const cancelAddFriend = () => {
   form.value.reset();
-  newFriend.value.status = "online";
+  newFriend.value.name = "";
   addFriendDialog.value = false;
 };
 
+// Funções para filtrar e ordenar a lista de amigos, agora com base no `onlineUsers` do socket
 const filteredFriends = computed(() => {
   if (!searchQuery.value) return friends.value;
   return friends.value.filter((friend) =>
@@ -229,26 +235,24 @@ const filteredFriends = computed(() => {
 
 const onlineFriends = computed(() => {
   return filteredFriends.value
-    .filter((f) => f.status === "online")
+    .filter((f) => onlineUsers.value[f.id] === "online") // Verifica o status do socket
     .sort((a, b) => a.name.localeCompare(b.name));
 });
 
 const offlineFriends = computed(() => {
   return filteredFriends.value
-    .filter((f) => f.status === "offline")
+    .filter((f) => onlineUsers.value[f.id] !== "online") // Considera offline se não estiver explicitamente 'online'
     .sort((a, b) => a.name.localeCompare(b.name));
 });
 
 const getStatusText = (friend) => {
+  // Se o amigo tem um jogo, exibe isso. Caso contrário, exibe o status de online/offline.
   if (friend.game) return `Jogando ${friend.game}`;
-  if (friend.status === "online") return "Online";
-  return "Offline";
+  return onlineUsers.value[friend.id] === "online" ? "Online" : "Offline";
 };
 
-const getStatusColor = (status) => {
-  if (status === "online") return "success";
-  if (status === "away") return "warning";
-  return "grey";
+const getOnlineStatusColor = (friendId) => {
+  return onlineUsers.value[friendId] === "online" ? "success" : "grey";
 };
 </script>
 

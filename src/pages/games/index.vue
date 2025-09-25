@@ -1,3 +1,11 @@
+<route lang="yaml">
+meta:
+  requiresAuth: true
+  searchable: true
+  title: "Página games"
+  icon: "mdi-check-circle-outline"
+</route>
+
 <template>
   <v-container fluid class="pa-4">
     <h1 class="text-h4 font-weight-bold mb-4">Minha Biblioteca de Jogos</h1>

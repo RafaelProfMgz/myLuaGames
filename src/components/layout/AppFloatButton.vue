@@ -103,7 +103,6 @@ const handleKeyDown = (event) => {
 };
 
 onMounted(() => {
-  console.log("ROTAS DISPONÍVEIS:", router.getRoutes());
   window.addEventListener("keydown", handleKeyDown);
 });
 

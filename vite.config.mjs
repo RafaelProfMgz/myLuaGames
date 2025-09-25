@@ -18,6 +18,7 @@ export default defineConfig({
     VueRouter({
       // Opcional, mas recomendado para garantir que ele encontre suas páginas
       routesFolder: "src/pages",
+      trailingSlash: false,
     }),
     Layouts(),
     Vue({

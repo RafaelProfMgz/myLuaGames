@@ -3,11 +3,11 @@
     <v-form @submit.prevent="onSubmit">
       <v-text-field
         v-model="form.username"
-        label="E-mail ou Usuário"
+        label="Usuário"
         variant="solo-filled"
         density="compact"
         clearable
-        placeholder="Digite seu e-mail ou usuário"
+        placeholder="Digite seu usuário"
         prepend-inner-icon="mdi-account"
         class="mb-3"
       ></v-text-field>

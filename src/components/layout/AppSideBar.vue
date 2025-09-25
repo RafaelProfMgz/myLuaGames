@@ -4,9 +4,10 @@
       <v-navigation-drawer absolute permanent>
         <v-list>
           <v-list-item
-            prepend-avatar="https://cdn.vuetifyjs.com/images/john.png"
-            subtitle="john@google.com"
-            title="John Leider"
+            v-if="user"
+            :prepend-icon="'mdi-account-circle'"
+            :subtitle="user.email"
+            :title="user.username"
           >
             <template v-slot:append>
               <DropMenuHover />
@@ -37,18 +38,23 @@
     </v-layout>
   </v-card>
 </template>
+
 <script setup>
+import { computed } from "vue";
+import { useAppStore } from "@/stores/app";
 import DropMenuHover from "../ui/DropMenuHover.vue";
 
-const items = reactive([
-  { text: "Home", icon: "mdi-home", value: "/" },
-  { text: "Meus jogos", icon: "mdi-folder", value: "/games/AppGames" },
-  { text: "Favoritos", icon: "mdi-star", value: "AppFavorites" },
-  { text: "Histórico", icon: "mdi-history", value: "/hystory/AppHistory" },
+const appStore = useAppStore();
+
+const user = computed(() => appStore.user);
+
+const items = [
+  { text: "Home", icon: "mdi-home", value: "/home" },
+  { text: "Meus jogos", icon: "mdi-folder", value: "/games" },
   {
     text: "Concluídos",
     icon: "mdi-check-circle",
-    value: "completed/AppCompleted",
+    value: "/completed",
   },
-]);
+];
 </script>

@@ -1,3 +1,4 @@
+<!-- Seu componente de menu -->
 <template>
   <div class="text-center">
     <v-menu open-on-hover>
@@ -12,47 +13,57 @@
 
       <v-list>
         <v-list-item
-          v-for="(item, index) in items"
-          :key="index"
-          :value="index"
-          @click="handleAction(item.title)"
+          v-for="item in items"
+          :key="item.action"
+          :value="item.action"
+          @click="handleAction(item.action)"
         >
+          <template v-slot:prepend>
+            <v-icon :icon="item.icon"></v-icon>
+          </template>
           <v-list-item-title>{{ item.title }}</v-list-item-title>
         </v-list-item>
       </v-list>
     </v-menu>
+
+    <UserProfileModal
+      :is-open="isProfileModalOpen"
+      :user="user"
+      @close="isProfileModalOpen = false"
+    />
   </div>
 </template>
 
 <script setup>
+import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
+import { useAppStore } from "@/stores/app";
+import UserProfileModal from "../modals/UserProfileModal.vue";
 
 const router = useRouter();
+const appStore = useAppStore();
+
+const isProfileModalOpen = ref(false);
+
+const user = computed(() => appStore.user);
 
 const items = [
-  { title: "Perfil", action: "profile" },
-  { title: "Notificações", action: "notifications" },
-  { title: "Configurações", action: "settings" },
-  { title: "Logout", action: "logout" },
+  { title: "Perfil", action: "profile", icon: "mdi-account-circle" },
+  { title: "Logout", action: "logout", icon: "mdi-logout" },
 ];
 
-const handleAction = (actionTitle) => {
-  if (actionTitle === "Logout") {
+const handleAction = (action) => {
+  if (action === "profile") {
+    isProfileModalOpen.value = true;
+  } else if (action === "logout") {
     logout();
-  } else {
-    // Lógica para outras ações, como navegar para a página de perfil
-    console.log(`Clicou em ${actionTitle}`);
-    // Exemplo de navegação: router.push('/profile');
   }
 };
 
+// Função de logout que usa a store
 const logout = () => {
-  // 1. Remove o token do localStorage
-  localStorage.removeItem("auth_token");
+  appStore.logout();
 
-  // 2. Redireciona o usuário para a página de login
-  router.push("/login/Login");
-
-  console.log("Usuário deslogado com sucesso!");
+  router.push("/login");
 };
 </script>

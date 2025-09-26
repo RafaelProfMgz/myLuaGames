@@ -3,11 +3,13 @@
   <v-card class="friends-list-container" elevation="12">
     <!-- CABEÇALHO -->
     <v-toolbar color="grey-darken-3">
-      <v-toolbar-title>Amigos</v-toolbar-title>
+      <v-toolbar-title>Usuários</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn icon @click="addFriendDialog = true">
+      <!-- O botão de adicionar amigos foi desabilitado pois agora a lista vem do servidor.
+           Para adicionar um amigo, seria necessário um evento de socket ou uma chamada de API. -->
+      <!-- <v-btn icon @click="addFriendDialog = true">
         <v-icon>mdi-account-plus</v-icon>
-      </v-btn>
+      </v-btn> -->
       <v-btn icon @click="emit('close')">
         <v-icon>mdi-close</v-icon>
       </v-btn>
@@ -17,7 +19,7 @@
     <div class="pa-4">
       <v-text-field
         v-model="searchQuery"
-        label="Procurar amigos"
+        label="Procurar usuários"
         prepend-inner-icon="mdi-magnify"
         variant="solo-filled"
         density="compact"
@@ -27,47 +29,46 @@
     </div>
     <v-divider></v-divider>
 
-    <!-- ÁREA DA LISTA DE AMIGOS -->
+    <!-- ÁREA DA LISTA DE USUÁRIOS -->
     <div class="friends-list-scroll">
       <v-expansion-panels
-        v-if="filteredFriends.length > 0"
+        v-if="filteredUsers.length > 0"
         variant="accordion"
         v-model="panel"
       >
         <!-- Categoria Online -->
-        <v-expansion-panel v-if="onlineFriends.length > 0" value="online">
+        <v-expansion-panel v-if="onlineUsers.length > 0" value="online">
           <v-expansion-panel-title>
-            Online ({{ onlineFriends.length }})
+            Online ({{ onlineUsers.length }})
           </v-expansion-panel-title>
           <v-expansion-panel-text class="pa-0">
             <v-list lines="two" density="compact" nav>
               <v-list-item
-                v-for="friend in onlineFriends"
-                :key="friend.id"
-                :value="friend"
+                v-for="user in onlineUsers"
+                :key="user.id"
+                :value="user"
                 color="primary"
-                @click="openChat(friend)"
+                @click="openChat(user)"
               >
                 <template v-slot:prepend>
                   <v-badge
-                    :color="getOnlineStatusColor(friend.id)"
                     dot
+                    color="success"
                     location="bottom end"
                     offset-x="3"
                     offset-y="3"
                   >
-                    <v-avatar size="40">
-                      <v-img :src="friend.avatar" :alt="friend.name"></v-img>
+                    <v-avatar size="40" color="info">
+                      <!-- O objeto de usuário do servidor não tem 'avatar', então usamos a inicial do nome -->
+                      <span>{{ user.username.charAt(0).toUpperCase() }}</span>
                     </v-avatar>
                   </v-badge>
                 </template>
                 <v-list-item-title class="font-weight-medium">{{
-                  friend.name
+                  user.username
                 }}</v-list-item-title>
-                <v-list-item-subtitle
-                  :style="{ color: friend.game ? '#86bde8' : '' }"
-                >
-                  {{ getStatusText(friend) }}
+                <v-list-item-subtitle>
+                  {{ user.status }}
                 </v-list-item-subtitle>
               </v-list-item>
             </v-list>
@@ -75,28 +76,26 @@
         </v-expansion-panel>
 
         <!-- Categoria Offline -->
-        <v-expansion-panel v-if="offlineFriends.length > 0" value="offline">
+        <v-expansion-panel v-if="offlineUsers.length > 0" value="offline">
           <v-expansion-panel-title>
-            Offline ({{ offlineFriends.length }})
+            Offline ({{ offlineUsers.length }})
           </v-expansion-panel-title>
           <v-expansion-panel-text class="pa-0">
             <v-list lines="two" density="compact" nav>
               <v-list-item
-                v-for="friend in offlineFriends"
-                :key="friend.id"
-                :value="friend"
+                v-for="user in offlineUsers"
+                :key="user.id"
+                :value="user"
                 class="friend-offline"
-                @click="openChat(friend)"
+                @click="openChat(user)"
               >
                 <template v-slot:prepend>
                   <v-avatar size="40">
-                    <v-img :src="friend.avatar" :alt="friend.name"></v-img>
+                    <span>{{ user.username.charAt(0).toUpperCase() }}</span>
                   </v-avatar>
                 </template>
-                <v-list-item-title>{{ friend.name }}</v-list-item-title>
-                <v-list-item-subtitle>{{
-                  getStatusText(friend)
-                }}</v-list-item-subtitle>
+                <v-list-item-title>{{ user.username }}</v-list-item-title>
+                <v-list-item-subtitle>{{ user.status }}</v-list-item-subtitle>
               </v-list-item>
             </v-list>
           </v-expansion-panel-text>
@@ -110,150 +109,55 @@
       >
         <v-icon size="48" class="mb-4">mdi-account-multiple-outline</v-icon>
         <span v-if="searchQuery"
-          >Nenhum amigo encontrado para "{{ searchQuery }}".</span
+          >Nenhum usuário encontrado para "{{ searchQuery }}".</span
         >
-        <span v-else
-          >Sua lista de amigos está vazia.<br />Clique em
-          <v-icon size="small">mdi-account-plus</v-icon> para adicionar.</span
-        >
+        <span v-else>Nenhum usuário disponível.</span>
       </div>
     </div>
-
-    <!-- MODAL PARA ADICIONAR NOVO AMIGO -->
-    <v-dialog v-model="addFriendDialog" max-width="500px" persistent>
-      <v-card>
-        <v-card-title>
-          <span class="text-h5">Adicionar Novo Amigo</span>
-        </v-card-title>
-        <v-card-text>
-          <v-form ref="form" v-model="isFormValid">
-            <v-text-field
-              v-model="newFriend.name"
-              label="ID ou Nome do Amigo"
-              :rules="[rules.required]"
-              variant="outlined"
-            ></v-text-field>
-            <!-- O status não será mais definido pelo cliente, mas pelo servidor -->
-            <!-- <v-select
-              v-model="newFriend.status"
-              :items="['online', 'offline']"
-              label="Status"
-              variant="outlined"
-            ></v-select> -->
-          </v-form>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="blue-darken-1" variant="text" @click="cancelAddFriend"
-            >Cancelar</v-btn
-          >
-          <v-btn
-            color="blue-darken-1"
-            variant="text"
-            @click="saveFriend"
-            :disabled="!isFormValid"
-            >Salvar</v-btn
-          >
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </v-card>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
-import useChatSocket from "@/plugins/socket";
+import { ref, computed } from "vue";
+import useChatSocket from "@/plugins/socket"; // Verifique se o caminho está correto
 
 const emit = defineEmits(["close", "open-chat"]);
+
+// Obtém a lista de usuários em tempo real do nosso composable
+const { allUsersList } = useChatSocket();
+
 const panel = ref(["online"]); // Expande a categoria online por padrão
 const searchQuery = ref("");
-const friends = ref([]);
-const addFriendDialog = ref(false);
-const isFormValid = ref(false);
-const form = ref(null);
 
-const { onlineUsers } = useChatSocket(); // Obtém o estado onlineUsers do socket
-
-const newFriend = ref({
-  name: "",
-  // status: "online", // Não será mais definido manualmente, mas pelo servidor
-});
-
-const openChat = (friend) => {
-  emit("open-chat", friend);
+const openChat = (user) => {
+  emit("open-chat", user);
 };
 
-const rules = {
-  required: (value) => !!value || "Campo obrigatório.",
-};
+// --- Computeds para filtrar e organizar a lista de usuários ---
 
-onMounted(() => {
-  const storedFriends = localStorage.getItem("friendsList");
-  if (storedFriends) {
-    friends.value = JSON.parse(storedFriends);
+// 1. Filtra a lista completa de usuários com base na busca
+const filteredUsers = computed(() => {
+  if (!searchQuery.value) {
+    return allUsersList.value;
   }
-});
-
-watch(
-  friends,
-  (newFriendsList) => {
-    localStorage.setItem("friendsList", JSON.stringify(newFriendsList));
-  },
-  { deep: true }
-);
-
-const saveFriend = () => {
-  if (!isFormValid.value) return;
-
-  // Em um sistema real, você faria uma requisição para adicionar um amigo no backend
-  // Por enquanto, simulamos aqui
-  friends.value.push({
-    id: newFriend.value.name.toLowerCase().replace(/\s/g, ""), // Usar o nome como ID simples para simulação
-    name: newFriend.value.name,
-    avatar: `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 70)}`,
-    game: null, // O status será determinado pelo servidor
-  });
-
-  form.value.reset();
-  newFriend.value.name = ""; // Limpa o nome para o próximo
-  addFriendDialog.value = false;
-};
-
-const cancelAddFriend = () => {
-  form.value.reset();
-  newFriend.value.name = "";
-  addFriendDialog.value = false;
-};
-
-// Funções para filtrar e ordenar a lista de amigos, agora com base no `onlineUsers` do socket
-const filteredFriends = computed(() => {
-  if (!searchQuery.value) return friends.value;
-  return friends.value.filter((friend) =>
-    friend.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+  return allUsersList.value.filter((user) =>
+    user.username.toLowerCase().includes(searchQuery.value.toLowerCase())
   );
 });
 
-const onlineFriends = computed(() => {
-  return filteredFriends.value
-    .filter((f) => onlineUsers.value[f.id] === "online") // Verifica o status do socket
-    .sort((a, b) => a.name.localeCompare(b.name));
+// 2. Pega os usuários filtrados e separa os que estão online
+const onlineUsers = computed(() => {
+  return filteredUsers.value
+    .filter((user) => user.status === "online")
+    .sort((a, b) => a.username.localeCompare(b.username));
 });
 
-const offlineFriends = computed(() => {
-  return filteredFriends.value
-    .filter((f) => onlineUsers.value[f.id] !== "online") // Considera offline se não estiver explicitamente 'online'
-    .sort((a, b) => a.name.localeCompare(b.name));
+// 3. Pega os usuários filtrados e separa os que estão offline
+const offlineUsers = computed(() => {
+  return filteredUsers.value
+    .filter((user) => user.status !== "online")
+    .sort((a, b) => a.username.localeCompare(b.username));
 });
-
-const getStatusText = (friend) => {
-  // Se o amigo tem um jogo, exibe isso. Caso contrário, exibe o status de online/offline.
-  if (friend.game) return `Jogando ${friend.game}`;
-  return onlineUsers.value[friend.id] === "online" ? "Online" : "Offline";
-};
-
-const getOnlineStatusColor = (friendId) => {
-  return onlineUsers.value[friendId] === "online" ? "success" : "grey";
-};
 </script>
 
 <style scoped>
@@ -269,6 +173,7 @@ const getOnlineStatusColor = (friendId) => {
   flex-grow: 1;
   overflow-y: auto;
 }
+/* Garante que o conteúdo dentro do painel não tenha padding extra */
 .v-expansion-panel-text :deep(.v-expansion-panel-text__wrapper) {
   padding: 0;
 }

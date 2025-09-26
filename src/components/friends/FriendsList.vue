@@ -1,10 +1,11 @@
+<!-- FriendsList.vue -->
 <template>
   <v-card class="friends-list-container" elevation="12">
     <!-- CABEÇALHO -->
     <v-toolbar color="grey-darken-3">
       <v-toolbar-title>Usuários</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn icon @click="emit('close')">
+      <v-btn icon @click="emit('close')" aria-label="Fechar lista de amigos">
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-toolbar>
@@ -26,23 +27,28 @@
     <!-- ÁREA DA LISTA DE USUÁRIOS -->
     <div class="friends-list-scroll">
       <v-expansion-panels
-        v-if="filteredUsers.length > 0"
+        v-if="
+          filteredOnlineFriends.length > 0 || filteredOfflineFriends.length > 0
+        "
         variant="accordion"
         v-model="panel"
       >
         <!-- Categoria Online -->
-        <v-expansion-panel v-if="onlineUsers.length > 0" value="online">
+        <v-expansion-panel
+          v-if="filteredOnlineFriends.length > 0"
+          value="online"
+        >
           <v-expansion-panel-title>
-            Online ({{ onlineUsers.length }})
+            Online ({{ filteredOnlineFriends.length }})
           </v-expansion-panel-title>
           <v-expansion-panel-text class="pa-0">
             <v-list lines="two" density="compact" nav>
               <v-list-item
-                v-for="user in onlineUsers"
-                :key="user.id"
-                :value="user"
+                v-for="friend in filteredOnlineFriends"
+                :key="friend.id"
+                :value="friend.id"
                 color="primary"
-                @click="openChat(user)"
+                @click="openChat(friend)"
               >
                 <template v-slot:prepend>
                   <v-badge
@@ -53,42 +59,43 @@
                     offset-y="3"
                   >
                     <v-avatar size="40" color="info">
-                      <span>{{ user.username.charAt(0).toUpperCase() }}</span>
+                      <span>{{ friend.username.charAt(0).toUpperCase() }}</span>
                     </v-avatar>
                   </v-badge>
                 </template>
                 <v-list-item-title class="font-weight-medium">{{
-                  user.username
+                  friend.username
                 }}</v-list-item-title>
-                <v-list-item-subtitle>
-                  {{ user.status }}
-                </v-list-item-subtitle>
+                <v-list-item-subtitle> Online </v-list-item-subtitle>
               </v-list-item>
             </v-list>
           </v-expansion-panel-text>
         </v-expansion-panel>
 
         <!-- Categoria Offline -->
-        <v-expansion-panel v-if="offlineUsers.length > 0" value="offline">
+        <v-expansion-panel
+          v-if="filteredOfflineFriends.length > 0"
+          value="offline"
+        >
           <v-expansion-panel-title>
-            Offline ({{ offlineUsers.length }})
+            Offline ({{ filteredOfflineFriends.length }})
           </v-expansion-panel-title>
           <v-expansion-panel-text class="pa-0">
             <v-list lines="two" density="compact" nav>
               <v-list-item
-                v-for="user in offlineUsers"
-                :key="user.id"
-                :value="user"
+                v-for="friend in filteredOfflineFriends"
+                :key="friend.id"
+                :value="friend.id"
                 class="friend-offline"
-                @click="openChat(user)"
+                @click="openChat(friend)"
               >
                 <template v-slot:prepend>
                   <v-avatar size="40">
-                    <span>{{ user.username.charAt(0).toUpperCase() }}</span>
+                    <span>{{ friend.username.charAt(0).toUpperCase() }}</span>
                   </v-avatar>
                 </template>
-                <v-list-item-title>{{ user.username }}</v-list-item-title>
-                <v-list-item-subtitle>{{ user.status }}</v-list-item-subtitle>
+                <v-list-item-title>{{ friend.username }}</v-list-item-title>
+                <v-list-item-subtitle>Offline</v-list-item-subtitle>
               </v-list-item>
             </v-list>
           </v-expansion-panel-text>
@@ -111,38 +118,42 @@
 </template>
 
 <script setup>
+import { useFriendStore } from "@/stores/friendStore";
 import { ref, computed } from "vue";
-import useChatSocket from "@/plugins/socket";
 
 const emit = defineEmits(["close", "open-chat"]);
 
-const { allUsersList } = useChatSocket();
+const friendStore = useFriendStore(); // Inicializa a store
 
 const panel = ref(["online"]);
 const searchQuery = ref("");
 
-const openChat = (user) => {
-  emit("open-chat", user);
+const openChat = (friend) => {
+  emit("open-chat", friend);
 };
 
-const filteredUsers = computed(() => {
+// Usa os getters da store Pinia e aplica a filtragem e ordenação
+const allFriendsFromStore = computed(() => friendStore.allFriends);
+
+const filteredFriends = computed(() => {
   if (!searchQuery.value) {
-    return allUsersList.value;
+    return allFriendsFromStore.value;
   }
-  return allUsersList.value.filter((user) =>
-    user.username.toLowerCase().includes(searchQuery.value.toLowerCase())
+  const query = searchQuery.value.toLowerCase();
+  return allFriendsFromStore.value.filter((friend) =>
+    friend.username.toLowerCase().includes(query)
   );
 });
 
-const onlineUsers = computed(() => {
-  return filteredUsers.value
-    .filter((user) => user.status === "online")
+const filteredOnlineFriends = computed(() => {
+  return filteredFriends.value
+    .filter((friend) => friend.status === "online")
     .sort((a, b) => a.username.localeCompare(b.username));
 });
 
-const offlineUsers = computed(() => {
-  return filteredUsers.value
-    .filter((user) => user.status !== "online")
+const filteredOfflineFriends = computed(() => {
+  return filteredFriends.value
+    .filter((friend) => friend.status !== "online")
     .sort((a, b) => a.username.localeCompare(b.username));
 });
 </script>
@@ -155,16 +166,20 @@ const offlineUsers = computed(() => {
   z-index: 1000;
   display: flex;
   flex-direction: column;
+  background-color: var(
+    --v-theme-surface
+  ); /* Garante que o fundo seja temático */
 }
 .friends-list-scroll {
   flex-grow: 1;
   overflow-y: auto;
 }
 
+/* Ajuste para remover padding extra do Vuetify expansion panel text */
 .v-expansion-panel-text :deep(.v-expansion-panel-text__wrapper) {
   padding: 0;
 }
 .friend-offline {
-  opacity: 0.6;
+  opacity: 0.7; /* Suavemente mais transparente */
 }
 </style>

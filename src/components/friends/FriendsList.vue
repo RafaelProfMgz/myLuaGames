@@ -1,15 +1,9 @@
-<!-- FriendsList.vue -->
 <template>
   <v-card class="friends-list-container" elevation="12">
     <!-- CABEÇALHO -->
     <v-toolbar color="grey-darken-3">
       <v-toolbar-title>Usuários</v-toolbar-title>
       <v-spacer></v-spacer>
-      <!-- O botão de adicionar amigos foi desabilitado pois agora a lista vem do servidor.
-           Para adicionar um amigo, seria necessário um evento de socket ou uma chamada de API. -->
-      <!-- <v-btn icon @click="addFriendDialog = true">
-        <v-icon>mdi-account-plus</v-icon>
-      </v-btn> -->
       <v-btn icon @click="emit('close')">
         <v-icon>mdi-close</v-icon>
       </v-btn>
@@ -59,7 +53,6 @@
                     offset-y="3"
                   >
                     <v-avatar size="40" color="info">
-                      <!-- O objeto de usuário do servidor não tem 'avatar', então usamos a inicial do nome -->
                       <span>{{ user.username.charAt(0).toUpperCase() }}</span>
                     </v-avatar>
                   </v-badge>
@@ -119,23 +112,19 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import useChatSocket from "@/plugins/socket"; // Verifique se o caminho está correto
+import useChatSocket from "@/plugins/socket";
 
 const emit = defineEmits(["close", "open-chat"]);
 
-// Obtém a lista de usuários em tempo real do nosso composable
 const { allUsersList } = useChatSocket();
 
-const panel = ref(["online"]); // Expande a categoria online por padrão
+const panel = ref(["online"]);
 const searchQuery = ref("");
 
 const openChat = (user) => {
   emit("open-chat", user);
 };
 
-// --- Computeds para filtrar e organizar a lista de usuários ---
-
-// 1. Filtra a lista completa de usuários com base na busca
 const filteredUsers = computed(() => {
   if (!searchQuery.value) {
     return allUsersList.value;
@@ -145,14 +134,12 @@ const filteredUsers = computed(() => {
   );
 });
 
-// 2. Pega os usuários filtrados e separa os que estão online
 const onlineUsers = computed(() => {
   return filteredUsers.value
     .filter((user) => user.status === "online")
     .sort((a, b) => a.username.localeCompare(b.username));
 });
 
-// 3. Pega os usuários filtrados e separa os que estão offline
 const offlineUsers = computed(() => {
   return filteredUsers.value
     .filter((user) => user.status !== "online")
@@ -173,7 +160,7 @@ const offlineUsers = computed(() => {
   flex-grow: 1;
   overflow-y: auto;
 }
-/* Garante que o conteúdo dentro do painel não tenha padding extra */
+
 .v-expansion-panel-text :deep(.v-expansion-panel-text__wrapper) {
   padding: 0;
 }

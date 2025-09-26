@@ -13,11 +13,15 @@ export const registerUser = (userData) => {
         return reject(new Error("Usuário ou e-mail já cadastrado."));
       }
 
-      users.push(userData);
+      const userId =
+        Date.now().toString(36) + Math.random().toString(36).substring(2);
+
+      const userToRegister = { ...userData, id: userId };
+
+      users.push(userToRegister);
       localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
 
-      const { password, ...userToReturn } = userData;
-      resolve(userToReturn);
+      resolve(userToRegister);
     }, 300);
   });
 };

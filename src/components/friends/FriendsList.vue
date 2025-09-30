@@ -1,7 +1,5 @@
-<!-- FriendsList.vue -->
 <template>
   <v-card class="friends-list-container" elevation="12">
-    <!-- CABEÇALHO -->
     <v-toolbar color="grey-darken-3">
       <v-toolbar-title>Usuários</v-toolbar-title>
       <v-spacer></v-spacer>
@@ -10,7 +8,8 @@
       </v-btn>
     </v-toolbar>
 
-    <!-- CAMPO DE PESQUISA -->
+    <v-divider></v-divider>
+
     <div class="pa-4">
       <v-text-field
         v-model="searchQuery"
@@ -22,18 +21,70 @@
         clearable
       ></v-text-field>
     </div>
+
     <v-divider></v-divider>
 
-    <!-- ÁREA DA LISTA DE USUÁRIOS -->
     <div class="friends-list-scroll">
       <v-expansion-panels
         v-if="
-          filteredOnlineFriends.length > 0 || filteredOfflineFriends.length > 0
+          friendRequestsReceived.length > 0 ||
+          filteredOnlineFriends.length > 0 ||
+          filteredOfflineFriends.length > 0 ||
+          filteredPotentialFriends.length > 0
         "
         variant="accordion"
         v-model="panel"
       >
-        <!-- Categoria Online -->
+        <!-- Pedidos de Amizade Recebidos -->
+        <v-expansion-panel
+          v-if="friendRequestsReceived.length > 0"
+          value="requests-received"
+        >
+          <v-expansion-panel-title>
+            Pedidos Recebidos ({{ friendRequestsReceived.length }})
+          </v-expansion-panel-title>
+          <v-expansion-panel-text class="pa-0">
+            <v-list lines="two" density="compact" nav>
+              <v-list-item
+                v-for="request in friendRequestsReceived"
+                :key="request.id"
+              >
+                <template v-slot:prepend>
+                  <v-avatar size="40" color="orange">
+                    <span>{{
+                      request.senderName.charAt(0).toUpperCase()
+                    }}</span>
+                  </v-avatar>
+                </template>
+                <v-list-item-title class="font-weight-medium">{{
+                  request.senderName
+                }}</v-list-item-title>
+                <v-list-item-subtitle> Enviou um pedido </v-list-item-subtitle>
+                <template v-slot:append>
+                  <v-btn
+                    icon="mdi-check"
+                    size="small"
+                    color="success"
+                    variant="tonal"
+                    class="mr-2"
+                    @click="acceptFriend(request.senderId)"
+                    aria-label="Aceitar pedido"
+                  ></v-btn>
+                  <v-btn
+                    icon="mdi-close"
+                    size="small"
+                    color="error"
+                    variant="tonal"
+                    @click="rejectFriend(request.senderId)"
+                    aria-label="Rejeitar pedido"
+                  ></v-btn>
+                </template>
+              </v-list-item>
+            </v-list>
+          </v-expansion-panel-text>
+        </v-expansion-panel>
+
+        <!-- Amigos Online -->
         <v-expansion-panel
           v-if="filteredOnlineFriends.length > 0"
           value="online"
@@ -67,12 +118,31 @@
                   friend.username
                 }}</v-list-item-title>
                 <v-list-item-subtitle> Online </v-list-item-subtitle>
+                <template v-slot:append>
+                  <v-btn
+                    icon="mdi-chat"
+                    size="small"
+                    variant="tonal"
+                    color="primary"
+                    class="mr-2"
+                    @click.stop="openChat(friend)"
+                    aria-label="Abrir chat"
+                  ></v-btn>
+                  <v-btn
+                    icon="mdi-close-circle"
+                    size="small"
+                    variant="tonal"
+                    color="error"
+                    @click.stop="removeFriend(friend.id)"
+                    aria-label="Remover amigo"
+                  ></v-btn>
+                </template>
               </v-list-item>
             </v-list>
           </v-expansion-panel-text>
         </v-expansion-panel>
 
-        <!-- Categoria Offline -->
+        <!-- Amigos Offline -->
         <v-expansion-panel
           v-if="filteredOfflineFriends.length > 0"
           value="offline"
@@ -96,13 +166,72 @@
                 </template>
                 <v-list-item-title>{{ friend.username }}</v-list-item-title>
                 <v-list-item-subtitle>Offline</v-list-item-subtitle>
+                <template v-slot:append>
+                  <v-btn
+                    icon="mdi-chat"
+                    size="small"
+                    variant="tonal"
+                    color="primary"
+                    class="mr-2"
+                    @click.stop="openChat(friend)"
+                    aria-label="Abrir chat"
+                  ></v-btn>
+                  <v-btn
+                    icon="mdi-close-circle"
+                    size="small"
+                    variant="tonal"
+                    color="error"
+                    @click.stop="removeFriend(friend.id)"
+                    aria-label="Remover amigo"
+                  ></v-btn>
+                </template>
+              </v-list-item>
+            </v-list>
+          </v-expansion-panel-text>
+        </v-expansion-panel>
+
+        <!-- Adicionar Amigos (Potenciais) -->
+        <v-expansion-panel
+          v-if="filteredPotentialFriends.length > 0"
+          value="add-friends"
+        >
+          <v-expansion-panel-title>
+            Adicionar Amigos ({{ filteredPotentialFriends.length }})
+          </v-expansion-panel-title>
+          <v-expansion-panel-text class="pa-0">
+            <v-list lines="two" density="compact" nav>
+              <v-list-item
+                v-for="user in filteredPotentialFriends"
+                :key="user.id"
+                :value="user.id"
+              >
+                <template v-slot:prepend>
+                  <v-avatar size="40" color="indigo">
+                    <span>{{ user.name.charAt(0).toUpperCase() }}</span>
+                  </v-avatar>
+                </template>
+                <v-list-item-title class="font-weight-medium">{{
+                  user.name
+                }}</v-list-item-title>
+                <v-list-item-subtitle>
+                  {{ user.isOnline ? "Online" : "Offline" }}
+                </v-list-item-subtitle>
+                <template v-slot:append>
+                  <v-btn
+                    icon="mdi-account-plus"
+                    size="small"
+                    color="success"
+                    variant="tonal"
+                    @click="sendFriendRequest(user.id)"
+                    aria-label="Enviar pedido de amizade"
+                  ></v-btn>
+                </template>
               </v-list-item>
             </v-list>
           </v-expansion-panel-text>
         </v-expansion-panel>
       </v-expansion-panels>
 
-      <!-- MENSAGEM DE LISTA VAZIA -->
       <div
         v-else
         class="text-center pa-8 text-grey d-flex flex-column align-center"
@@ -119,67 +248,100 @@
 
 <script setup>
 import { useFriendStore } from "@/stores/friendStore";
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
+import { createPrivateChat } from "@/plugins/socket";
 
+const friendStore = useFriendStore();
 const emit = defineEmits(["close", "open-chat"]);
 
-const friendStore = useFriendStore(); // Inicializa a store
-
-const panel = ref(["online"]);
 const searchQuery = ref("");
+const panel = ref(["online", "requests-received"]); // Painéis expandidos por padrão
 
-const openChat = (friend) => {
-  emit("open-chat", friend);
-};
+// Computed properties do FriendStore
+const allFriendsWithStatus = computed(() => friendStore.getFriendsWithStatus);
+const friendRequestsReceived = computed(
+  () => friendStore.friendRequestsReceived
+);
+const potentialFriends = computed(() => friendStore.getPotentialFriends);
 
-// Usa os getters da store Pinia e aplica a filtragem e ordenação
-const allFriendsFromStore = computed(() => friendStore.allFriends);
-
-const filteredFriends = computed(() => {
-  if (!searchQuery.value) {
-    return allFriendsFromStore.value;
-  }
-  const query = searchQuery.value.toLowerCase();
-  return allFriendsFromStore.value.filter((friend) =>
-    friend.username.toLowerCase().includes(query)
+// Filtra amigos online/offline
+const filteredOnlineFriends = computed(() => {
+  return allFriendsWithStatus.value.filter(
+    (friend) =>
+      friend.isOnline &&
+      friend.username.toLowerCase().includes(searchQuery.value.toLowerCase())
   );
 });
 
-const filteredOnlineFriends = computed(() => {
-  return filteredFriends.value
-    .filter((friend) => friend.status === "online")
-    .sort((a, b) => a.username.localeCompare(b.username));
+const filteredOfflineFriends = computed(() => {
+  return allFriendsWithStatus.value.filter(
+    (friend) =>
+      !friend.isOnline &&
+      friend.username.toLowerCase().includes(searchQuery.value.toLowerCase())
+  );
 });
 
-const filteredOfflineFriends = computed(() => {
-  return filteredFriends.value
-    .filter((friend) => friend.status !== "online")
-    .sort((a, b) => a.username.localeCompare(b.username));
+// Filtra potenciais amigos
+const filteredPotentialFriends = computed(() => {
+  return potentialFriends.value.filter((user) =>
+    user.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+  );
 });
+
+const openChat = (friend) => {
+  createPrivateChat(friend.id); // Avisa o socket para iniciar/obter o chat privado
+
+  emit("open-chat", friend);
+};
+
+// Funções para interação com amigos via friendStore actions
+const sendFriendRequest = (receiverId) => {
+  friendStore.sendFriendRequest(receiverId);
+};
+
+const acceptFriend = (senderId) => {
+  friendStore.acceptFriendRequest(senderId);
+};
+
+const rejectFriend = (senderId) => {
+  friendStore.rejectFriendRequest(senderId);
+};
+
+const removeFriend = (friendId) => {
+  friendStore.removeFriend(friendId);
+};
+
+// Se você quiser que o painel de "Pedidos Recebidos" esteja sempre aberto se houver pedidos
+watch(
+  friendRequestsReceived,
+  (newVal) => {
+    if (newVal.length > 0 && !panel.value.includes("requests-received")) {
+      panel.value.push("requests-received");
+    } else if (
+      newVal.length === 0 &&
+      panel.value.includes("requests-received")
+    ) {
+      panel.value = panel.value.filter((p) => p !== "requests-received");
+    }
+  },
+  { immediate: true }
+);
 </script>
 
 <style scoped>
 .friends-list-container {
-  height: 400px;
-  width: 350px;
-  max-height: 70vh;
-  z-index: 1000;
   display: flex;
   flex-direction: column;
-  background-color: var(
-    --v-theme-surface
-  ); /* Garante que o fundo seja temático */
+  height: 100%;
 }
+
 .friends-list-scroll {
   flex-grow: 1;
   overflow-y: auto;
 }
 
-/* Ajuste para remover padding extra do Vuetify expansion panel text */
-.v-expansion-panel-text :deep(.v-expansion-panel-text__wrapper) {
-  padding: 0;
-}
-.friend-offline {
-  opacity: 0.7; /* Suavemente mais transparente */
+.friend-offline .v-list-item-title,
+.friend-offline .v-list-item-subtitle {
+  color: grey;
 }
 </style>

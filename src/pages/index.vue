@@ -8,6 +8,8 @@ meta:
 
 <template>
   <v-container fluid class="dashboard-container pa-0">
+    <AppBackground />
+
     <v-row no-gutters class="fill-height align-center justify-center">
       <v-col cols="12" md="8" lg="6">
         <v-card
@@ -16,7 +18,7 @@ meta:
           rounded="xl"
         >
           <v-card-title class="justify-center text-h4 font-weight-bold mb-4">
-            <v-icon large color="primary" class="mr-3"
+            <v-icon large color="deep-purple-darken-2" class="mr-3"
               >mdi-rocket-launch-outline</v-icon
             >
             Bem-vindo ao Lua Games!
@@ -31,8 +33,8 @@ meta:
 
           <v-row justify="center" class="mb-6">
             <v-col cols="12" sm="6" md="4">
-              <v-card flat class="pa-4 feature-card">
-                <v-icon x-large color="accent" class="mb-3"
+              <v-card flat class="pa-4 feature-card" rounded="xl">
+                <v-icon x-large color="deep-purple" class="mb-3"
                   >mdi-play-outline</v-icon
                 >
                 <div class="text-subtitle-1 font-weight-medium">
@@ -44,8 +46,8 @@ meta:
               </v-card>
             </v-col>
             <v-col cols="12" sm="6" md="4">
-              <v-card flat class="pa-4 feature-card">
-                <v-icon x-large color="accent" class="mb-3"
+              <v-card flat class="pa-4 feature-card" rounded="xl">
+                <v-icon x-large color="deep-purple" class="mb-3"
                   >mdi-chart-bar</v-icon
                 >
                 <div class="text-subtitle-1 font-weight-medium">
@@ -57,8 +59,10 @@ meta:
               </v-card>
             </v-col>
             <v-col cols="12" sm="6" md="4">
-              <v-card flat class="pa-4 feature-card">
-                <v-icon x-large color="accent" class="mb-3">mdi-plus</v-icon>
+              <v-card flat class="pa-4 feature-card" rounded="xl">
+                <v-icon x-large color="deep-purple" class="mb-3"
+                  >mdi-plus</v-icon
+                >
                 <div class="text-subtitle-1 font-weight-medium">
                   Encontre pessoas novas
                 </div>
@@ -68,8 +72,8 @@ meta:
               </v-card>
             </v-col>
             <v-col cols="12" sm="6" md="4">
-              <v-card flat class="pa-4 feature-card">
-                <v-icon x-large color="accent" class="mb-3"
+              <v-card flat class="pa-4 feature-card" rounded="xl">
+                <v-icon x-large color="deep-purple" class="mb-3"
                   >mdi-share-variant-outline</v-icon
                 >
                 <div class="text-subtitle-1 font-weight-medium">
@@ -81,18 +85,6 @@ meta:
               </v-card>
             </v-col>
           </v-row>
-
-          <v-btn
-            color="primary"
-            class="mt-4 px-8 py-3"
-            x-large
-            rounded
-            dark
-            to="/games"
-          >
-            Começar a Organizar!
-            <v-icon right>mdi-arrow-right</v-icon>
-          </v-btn>
         </v-card>
       </v-col>
     </v-row>
@@ -100,20 +92,25 @@ meta:
 </template>
 
 <script setup>
+import AppBackground from "@/components/animation/AppBackground.vue";
+
 // Adicione qualquer lógica de script necessária aqui
 </script>
 
 <style scoped>
 .dashboard-container {
+  /* Gradiente de fundo alterado para tons de roxo */
   background: linear-gradient(
     45deg,
-    #1a2a6c,
-    #b21f1f,
-    #fdbb2d
-  ); /* Um gradiente de fundo vibrante */
+    #311b92,
+    /* Roxo bem escuro */ #673ab7,
+    /* Roxo principal */ #9575cd /* Roxo mais claro */
+  );
+  position: relative;
+  width: 100%;
+  height: 100%;
   background-size: 400% 400%;
   animation: gradientAnimation 15s ease infinite;
-  min-height: 100vh; /* Garante que o gradiente preencha a tela */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -133,16 +130,20 @@ meta:
 
 .welcome-card {
   backdrop-filter: blur(5px); /* Efeito de desfoque para o fundo */
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.05); /* Fundo um pouco mais visível */
+  border: 1px solid rgba(225, 200, 255, 0.4); /* Borda com tom roxo */
+  z-index: 10;
 }
 
 .feature-card {
-  border-radius: 12px;
+  /* Arredondamento aumentado */
+  border-radius: 24px;
   transition: transform 0.3s ease-in-out;
+  background-color: rgba(255, 255, 255, 0.08); /* Fundo sutil */
 }
 
 .feature-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 24px rgba(49, 27, 146, 0.2); /* Sombra com tom roxo */
 }
 </style>

@@ -1,58 +1,36 @@
-<template>
-  <header class="app-header">
-    <div class="app-header__center">
-      <div class="app-header__logo">
-        <img
-          src="@/assets/logo.svg"
-          alt="Vuetify Logo"
-          class="app-header__logo-img"
-        />
-        <span class="app-header__app-name">Seu App</span>
-        <SelectTheme />
-      </div>
-    </div>
-  </header>
-</template>
-
 <script setup>
-import SelectTheme from "../ui/SelectTheme.vue";
+const items = [
+  {
+    title: "Minha Steam",
+    icon: `mdi-steam`,
+    href: "https://github.com/vuetifyjs/vuetify", // Lembre-se de atualizar os links
+  },
+  {
+    title: "Meu GitHub",
+    icon: `mdi-github`,
+    href: "https://github.com/vuetifyjs/vuetify",
+  },
+  {
+    title: "Meu Discord",
+    icon: `mdi-discord`, // Corrigido de mdi-twitter
+    href: "https://community.vuetifyjs.com/",
+  },
+  {
+    title: "Meu instagram",
+    icon: `mdi-instagram`,
+    href: "https://www.instagram.com/anrafaelmgz/",
+  },
+];
 </script>
 
 <style scoped>
-/* Estiliza o header */
-.app-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem 0;
-  background-color: var(--v-theme-surface);
-  border-bottom: 1px solid var(--v-theme-divider);
-  height: 64px;
+/* Adicionado um efeito de hover sutil para os botões sociais */
+.social-icon {
+  opacity: 0.6;
+  transition: opacity 0.2s ease-in-out;
 }
 
-/* Estiliza o conte do do header */
-.app-header__center {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-/* Estiliza a seção da logo */
-.app-header__logo {
-  width: 100%;
-  display: flex;
-  align-items: center;
-}
-
-/* Estiliza a logo */
-.app-header__logo-img {
-  height: 40px;
-  width: auto;
-}
-
-/* Estiliza o nome do app */
-.app-header__app-name {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--v-theme-on-surface);
+.social-icon:hover {
+  opacity: 1;
 }
 </style>

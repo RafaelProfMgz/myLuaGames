@@ -1,23 +1,15 @@
 <template>
-  <v-container class="fill-height justify-center align-center" fluid>
-    <v-card min-width="200">
-      <v-row align="center" no-gutters>
-        <v-col class="d-flex justify-center">
-          <v-icon :color="isDark ? 'grey-darken-1' : 'yellow-darken-3'"
-            >mdi-white-balance-sunny</v-icon
-          >
-        </v-col>
-        <v-col class="d-flex justify-center">
-          <v-switch v-model="isDark" hide-details inset></v-switch>
-        </v-col>
-        <v-col class="d-flex justify-center">
-          <v-icon :color="isDark ? 'white' : 'grey-darken-1'"
-            >mdi-weather-night</v-icon
-          >
-        </v-col>
-      </v-row>
-    </v-card>
-  </v-container>
+  <div class="d-flex align-center">
+    <v-icon :color="!isDark ? 'yellow-darken-3' : 'grey-darken-1'" class="mr-2"
+      >mdi-white-balance-sunny</v-icon
+    >
+
+    <v-switch v-model="isDark" hide-details inset color="primary"></v-switch>
+
+    <v-icon :color="isDark ? 'primary' : 'grey-darken-1'" class="ml-2"
+      >mdi-weather-night</v-icon
+    >
+  </div>
 </template>
 
 <script setup>

@@ -43,7 +43,7 @@ import { ref, computed } from "vue";
 import FriendsList from "./FriendsList.vue";
 import ChatPanel from "./ChatPanel.vue";
 import { useAppStore } from "@/stores/app";
-import { initializeSocket, socket } from "@/plugins/socket";
+import { socket } from "@/plugins/socket";
 
 const appStore = useAppStore();
 

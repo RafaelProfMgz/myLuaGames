@@ -11,12 +11,18 @@
     <AppBackground />
 
     <v-container class="login-wrapper fill-height justify-center align-center">
-      <v-card class="pa-6" min-width="400" rounded="lg" elevation="10">
+      <!-- O arredondamento foi aumentado para "xl" e uma classe "login-card" foi adicionada -->
+      <v-card
+        class="login-card pa-6"
+        min-width="400"
+        rounded="xl"
+        elevation="10"
+      >
         <v-tabs
           v-model="tab"
           bg-color="transparent"
           class="mb-4"
-          slider-color="primary"
+          slider-color="deep-purple"
         >
           <v-tab value="signIn" class="text-none">Login</v-tab>
           <v-tab value="signUp" class="text-none">Cadastrar</v-tab>
@@ -85,5 +91,12 @@ const onSignUp = async (formData) => {
   width: 100%;
   height: 100vh;
   z-index: 10;
+}
+
+/* Estilo adicionado para o efeito de vidro e borda roxa */
+.login-card {
+  backdrop-filter: blur(5px);
+  background-color: rgba(var(--v-theme-primary-rgb), 0.04);
+  border: 1px solid rgba(var(--v-theme-primary-rgb), 0.1);
 }
 </style>

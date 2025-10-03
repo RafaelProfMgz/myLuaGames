@@ -7,8 +7,8 @@ meta:
 </route>
 
 <template>
-  <v-container fluid class="pa-4">
-    <h1 class="text-h4 font-weight-bold mb-4">
+  <v-container fluid class="completed-container pa-4">
+    <h1 class="text-h4 font-weight-bold mb-4 text-primary">
       Jogos Concluídos ({{ completedGames.length }})
     </h1>
 
@@ -28,8 +28,9 @@ meta:
       class="text-center pa-16"
       flat
       color="transparent"
+      rounded="xl"
     >
-      <v-icon size="80" color="grey-lighten-1"
+      <v-icon size="80" class="text-medium-emphasis"
         >mdi-gamepad-variant-outline</v-icon
       >
       <p class="text-h6 mt-4">Nenhum jogo concluído ainda.</p>
@@ -49,7 +50,7 @@ meta:
         lg="3"
         xl="2"
       >
-        <v-card class="game-card" elevation="2">
+        <v-card class="game-card" elevation="2" rounded="lg">
           <v-img
             :src="game.cover || 'https://via.placeholder.com/400x300'"
             height="180px"
@@ -100,13 +101,23 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.completed-container {
+  /* Usa a cor de fundo do tema para ser compatível com light/dark mode */
+  background-color: rgb(var(--v-theme-background));
+  height: 100%;
+}
+
 .game-card {
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
   cursor: pointer;
+  background-color: rgb(var(--v-theme-surface));
+  color: rgb(var(--v-theme-primary));
+  height: 100%; /* Garante que os cards na mesma linha tenham a mesma altura */
 }
 
 .game-card:hover {
   transform: translateY(-4px);
+  background-color: rgb(var(--v-theme-surface));
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 </style>

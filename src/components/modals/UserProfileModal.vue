@@ -3,35 +3,56 @@
   <v-dialog
     :model-value="isOpen"
     @update:model-value="$emit('close')"
-    max-width="500px"
+    max-width="450px"
+    transition="dialog-bottom-transition"
   >
-    <v-card v-if="user" rounded="lg">
-      <v-card-title class="d-flex justify-space-between align-center">
-        <span class="text-h5">Perfil do Usuário</span>
-        <v-btn icon="mdi-close" variant="text" @click="$emit('close')"></v-btn>
-      </v-card-title>
-      <v-divider></v-divider>
+    <v-card v-if="user" rounded="xl" class="text-center">
+      <!-- Banner Superior e Avatar -->
+      <div>
+        <!-- Banner colorido no fundo -->
+        <v-card
+          color="primary"
+          height="100px"
+          flat
+          rounded="0"
+          class="d-flex justify-end pa-2"
+        >
+          <!-- Botão de fechar posicionado no banner -->
+          <v-btn
+            icon="mdi-close"
+            variant="text"
+            @click="$emit('close')"
+            color="on-primary"
+          />
+        </v-card>
 
-      <v-card-text>
-        <v-list lines="two">
-          <v-list-item
-            prepend-icon="mdi-account"
-            title="Nome de Usuário"
-            :subtitle="user.username"
-          ></v-list-item>
-          <v-divider inset></v-divider>
-          <v-list-item
-            prepend-icon="mdi-email"
-            title="E-mail"
-            :subtitle="user.email || 'Não informado'"
-          ></v-list-item>
-        </v-list>
+        <!-- Avatar do Usuário (sobrepondo o banner) -->
+        <v-avatar size="100" class="mt-n16 border">
+          <!-- Você pode substituir por uma imagem real do usuário se tiver -->
+          <v-icon size="60" color="grey-darken-1">mdi-account-circle</v-icon>
+        </v-avatar>
+      </div>
+
+      <!-- Conteúdo do Card: Nome e E-mail -->
+      <v-card-text class="pt-4">
+        <h5 class="text-h5 font-weight-bold">
+          {{ user.username }}
+        </h5>
+        <p class="text-medium-emphasis text-body-1">
+          {{ user.email || "E-mail não informado" }}
+        </p>
       </v-card-text>
-      <v-divider></v-divider>
 
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="primary" variant="text" @click="$emit('close')">
+      <v-divider class="mx-4 mb-2"></v-divider>
+
+      <!-- Ações do Card -->
+      <v-card-actions class="justify-center pa-4">
+        <v-btn
+          color="primary"
+          variant="tonal"
+          size="large"
+          @click="$emit('close')"
+        >
           Fechar
         </v-btn>
       </v-card-actions>
@@ -41,12 +62,10 @@
 
 <script setup>
 defineProps({
-  // Controla a visibilidade do modal
   isOpen: {
     type: Boolean,
     default: false,
   },
-  // O objeto com os dados do usuário a serem exibidos
   user: {
     type: Object,
     default: null,
@@ -55,3 +74,14 @@ defineProps({
 
 defineEmits(["close"]);
 </script>
+
+<style scoped>
+.border {
+  border: 4px solid white;
+}
+
+/* Negativo margin-top para puxar o avatar para cima */
+.mt-n16 {
+  margin-top: -64px;
+}
+</style>

@@ -1,7 +1,10 @@
 <template>
-  <v-card class="chat-panel-container" elevation="12">
-    <v-toolbar color="grey-darken-3" density="compact">
-      <v-avatar size="32" class="ml-2" color="info">
+  <!-- Arredondamento aumentado para "xl" -->
+  <v-card class="chat-panel-container" elevation="12" rounded="xl">
+    <!-- Cor da toolbar agora usa uma cor do tema que se adapta -->
+    <v-toolbar color="surface-variant" density="compact">
+      <v-avatar size="32" class="ml-2" color="primary">
+        <!-- Avatar agora usa a cor primária para consistência -->
         <span>{{ friend.username.charAt(0).toUpperCase() }}</span>
       </v-avatar>
       <v-toolbar-title class="mx-2 text-body-1 font-weight-bold">{{
@@ -23,40 +26,56 @@
         class="message-wrapper"
         :class="{ 'my-message': message.senderId === currentUserId }"
       >
-        <v-sheet class="message pa-2 rounded-lg" :elevation="2">
+        <!--
+          A cor da bolha agora é dinâmica usando o tema do Vuetify.
+          As suas mensagens são 'primary' (roxo), as outras são 'surface-variant'.
+          O arredondamento foi aumentado para "xl".
+        -->
+        <v-sheet
+          class="message pa-2"
+          rounded="xl"
+          :elevation="2"
+          :color="
+            message.senderId === currentUserId ? 'primary' : 'surface-variant'
+          "
+        >
           {{ message.content }}
-          <div
-            class="message-timestamp text-caption text-right text-grey-lighten-2"
-          >
+          <!-- A cor do timestamp foi ajustada para melhor contraste -->
+          <div class="message-timestamp text-caption text-right">
             {{ formatMessageTime(message.timestamp) }}
           </div>
         </v-sheet>
       </div>
-      <div v-if="chatMessages.length === 0" class="text-center text-grey pa-4">
+      <div
+        v-if="chatMessages.length === 0"
+        class="text-center text-medium-emphasis pa-4"
+      >
         Comece uma conversa!
       </div>
     </div>
 
     <v-card-actions class="pa-2">
+      <!-- Campo de texto também foi arredondado -->
       <v-text-field
         v-model="newMessage"
         label="Digite uma mensagem..."
         variant="solo-filled"
         density="compact"
         hide-details
+        rounded="lg"
         @keydown.enter="handleSendMessage"
         :disabled="!isConnected"
       >
       </v-text-field>
+      <!-- Botão já usava a cor 'primary', o que é perfeito -->
       <v-btn
         icon="mdi-send"
         color="primary"
         class="ml-2"
         @click="handleSendMessage"
         :disabled="!newMessage.trim() || !isConnected"
-      >
-        aria-label="Enviar mensagem" ></v-btn
-      >
+        aria-label="Enviar mensagem"
+      ></v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -142,39 +161,42 @@ onMounted(() => {
 .chat-panel-container {
   display: flex;
   flex-direction: column;
-  height: 100%; /* Ajuste conforme a necessidade do seu layout */
+  height: 100%;
   max-height: 500px; /* Exemplo */
+  overflow: hidden; /* Previne que elementos internos vazem do arredondamento */
 }
 
 .messages-area {
   flex-grow: 1;
   overflow-y: auto;
   padding: 16px;
-  background-color: #2e2e2e; /* Cor de fundo do chat */
+  /* Fundo agora usa a variável do tema, adaptando-se a light/dark mode */
+  background-color: rgb(var(--v-theme-background));
 }
 
 .message-wrapper {
   display: flex;
-  margin-bottom: 8px;
+  margin-bottom: 12px; /* Aumentado para mais respiro */
 }
 
-.message {
-  max-width: 70%;
-  background-color: #424242; /* Cor da bolha de mensagem do outro */
-  color: #fff;
-}
-
+/* Esta classe ainda é necessária para alinhar suas mensagens à direita */
 .my-message {
   justify-content: flex-end;
 }
 
-.my-message .message {
-  background-color: #1976d2; /* Cor da bolha de mensagem do meu usuário (primary) */
-  color: #fff;
+/*
+  AS REGRAS DE COR PARA .message E .my-message .message FORAM REMOVIDAS
+  porque a lógica agora está no :color da v-sheet no template.
+  Isso é mais limpo e compatível com os temas.
+*/
+.message {
+  max-width: 75%;
 }
 
 .message-timestamp {
   font-size: 0.75em;
   margin-top: 4px;
+  /* Opacidade para o timestamp, funciona bem em ambos os temas */
+  opacity: 0.7;
 }
 </style>

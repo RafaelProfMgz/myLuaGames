@@ -1,31 +1,80 @@
-<!-- Seu componente de menu -->
+<!-- Seu componente de menu aprimorado -->
 <template>
   <div class="text-center">
-    <v-menu open-on-hover>
+    <v-menu open-on-hover location="bottom end" transition="slide-y-transition">
       <template v-slot:activator="{ props }">
-        <v-btn
-          v-bind="props"
-          icon="mdi-menu-down"
-          size="small"
-          variant="text"
-        ></v-btn>
+        <!-- O ativador agora é um avatar, que é mais intuitivo para um menu de perfil -->
+        <v-btn v-bind="props" icon variant="text">
+          <v-avatar color="primary" size="20">
+            <span v-if="user"></span>
+            <v-icon v-else>mdi-account-circle</v-icon>
+          </v-avatar>
+        </v-btn>
       </template>
 
-      <v-list>
-        <v-list-item
-          v-for="item in items"
-          :key="item.action"
-          :value="item.action"
-          @click="handleAction(item.action)"
-        >
-          <template v-slot:prepend>
-            <v-icon :icon="item.icon"></v-icon>
-          </template>
-          <v-list-item-title>{{ item.title }}</v-list-item-title>
-        </v-list-item>
-      </v-list>
+      <!-- O menu em si está dentro de um v-card para melhor estilo e elevação -->
+      <v-card min-width="250" rounded="lg" class="mt-2">
+        <v-list density="compact">
+          <!-- Item de Cabeçalho: Exibe informações do usuário, não é clicável -->
+          <v-list-item class="px-3">
+            <template #prepend>
+              <v-avatar color="primary" size="40">
+                <span v-if="user" class="text-h6">{{
+                  user.username.charAt(0).toUpperCase()
+                }}</span>
+              </v-avatar>
+            </template>
+            <v-list-item-title class="font-weight-bold">{{
+              user?.username
+            }}</v-list-item-title>
+            <v-list-item-subtitle>{{ user?.email }}</v-list-item-subtitle>
+          </v-list-item>
+        </v-list>
+
+        <v-divider class="my-1" />
+
+        <!-- Ações do Usuário -->
+        <v-list density="compact" nav>
+          <v-list-item
+            v-for="item in items"
+            :key="item.action"
+            :value="item.action"
+            @click="handleAction(item.action)"
+            color="primary"
+            rounded="md"
+            class="mx-2"
+          >
+            <template #prepend>
+              <v-icon :icon="item.icon" size="20"></v-icon>
+            </template>
+            <v-list-item-title class="font-weight-medium text-body-2">{{
+              item.title
+            }}</v-list-item-title>
+          </v-list-item>
+        </v-list>
+
+        <v-divider class="my-1" />
+
+        <!-- Ação de Logout, com estilo diferenciado para indicar uma ação final -->
+        <v-list density="compact" nav>
+          <v-list-item
+            @click="handleAction('logout')"
+            color="error"
+            rounded="md"
+            class="mx-2"
+          >
+            <template #prepend>
+              <v-icon icon="mdi-logout" size="20" color="error"></v-icon>
+            </template>
+            <v-list-item-title class="font-weight-medium text-body-2 text-error"
+              >Logout</v-list-item-title
+            >
+          </v-list-item>
+        </v-list>
+      </v-card>
     </v-menu>
 
+    <!-- O modal permanece o mesmo -->
     <UserProfileModal
       :is-open="isProfileModalOpen"
       :user="user"
@@ -47,9 +96,14 @@ const isProfileModalOpen = ref(false);
 
 const user = computed(() => appStore.user);
 
+// A lista de itens agora contém apenas as ações "normais"
 const items = [
-  { title: "Perfil", action: "profile", icon: "mdi-account-circle" },
-  { title: "Logout", action: "logout", icon: "mdi-logout" },
+  {
+    title: "Ver Perfil",
+    action: "profile",
+    icon: "mdi-account-circle-outline",
+  },
+  // Adicione outras ações aqui, como "Configurações", "Ajuda", etc.
 ];
 
 const handleAction = (action) => {
@@ -60,10 +114,8 @@ const handleAction = (action) => {
   }
 };
 
-// Função de logout que usa a store
 const logout = () => {
   appStore.logout();
-
   router.push("/login");
 };
 </script>

@@ -7,16 +7,19 @@ meta:
 </route>
 
 <template>
-  <v-container fluid class="pa-4">
-    <h1 class="text-h4 font-weight-bold mb-4">Minha Biblioteca de Jogos</h1>
+  <v-container fluid class="games-container pa-4">
+    <h1 class="text-h4 font-weight-bold mb-4 text-deep-purple-darken-2">
+      Minha Biblioteca de Jogos
+    </h1>
 
-    <v-card>
+    <v-card rounded="xl">
       <v-card-title class="d-flex justify-space-between align-center flex-wrap">
         <span>Jogos Cadastrados ({{ gamesStore.totalGames }})</span>
         <v-btn
-          color="primary"
+          color="deep-purple-darken-2"
           @click="isFormDialogOpen = true"
           prepend-icon="mdi-plus"
+          rounded="lg"
         >
           Adicionar Jogo
         </v-btn>
@@ -40,6 +43,7 @@ meta:
             :key="game.id"
             class="game-card"
             elevation="2"
+            rounded="lg"
             @dblclick="openDetailsModal(game)"
           >
             <v-img
@@ -99,7 +103,7 @@ meta:
     </v-dialog>
 
     <v-dialog v-model="isConfirmDialogOpen" max-width="400px">
-      <v-card>
+      <v-card rounded="xl">
         <v-card-title class="text-h5">Confirmar Exclusão</v-card-title>
         <v-card-text>
           Você tem certeza que deseja excluir o jogo
@@ -127,6 +131,7 @@ const gamesStore = useGamesStore();
 
 const isFormDialogOpen = ref(false);
 const isDetailsDialogOpen = ref(false);
+const isConfirmDialogOpen = ref(false);
 const selectedGame = ref(null);
 
 onMounted(() => {
@@ -147,11 +152,6 @@ function handleSaveGame(gameData) {
 function openDetailsModal(game) {
   selectedGame.value = game;
   isDetailsDialogOpen.value = true;
-}
-
-function openAddModal() {
-  selectedGame.value = null;
-  isFormDialogOpen.value = true;
 }
 
 function openEditModal(game) {
@@ -179,6 +179,11 @@ function handleDeleteGame() {
 </script>
 
 <style scoped>
+.games-container {
+  /* Usando a variável CSS do Vuetify para o fundo */
+  background-color: rgb(var(--v-theme-background));
+  height: 100%;
+}
 .games-grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -186,16 +191,17 @@ function handleDeleteGame() {
 }
 
 .game-card {
+  /* A cor de fundo do card será "surface" do tema, não precisamos definir aqui */
   min-height: 250px;
   display: flex;
   flex-direction: column;
-  cursor: pointer;
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
 .game-card:hover {
   cursor: pointer;
   transform: translateY(-4px);
+  /* A cor da sombra é sutil e funciona bem em ambos os temas */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 </style>

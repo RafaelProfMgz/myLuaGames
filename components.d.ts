@@ -19,6 +19,7 @@ declare module 'vue' {
     AppSignUp: typeof import('./src/components/sign-up/AppSignUp.vue')['default']
     ChatFriends: typeof import('./src/components/friends/ChatPanel.vue')['default']
     ChatPanel: typeof import('./src/components/friends/ChatPanel.vue')['default']
+    Default: typeof import('./src/components/layout/Default.vue')['default']
     Details: typeof import('./src/components/games/Details.vue')['default']
     DropMenuHover: typeof import('./src/components/ui/DropMenuHover.vue')['default']
     FormGames: typeof import('./src/components/form/FormGames.vue')['default']
